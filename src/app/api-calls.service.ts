@@ -1,72 +1,115 @@
 import { Injectable } from '@angular/core';
 import { of, Observable, forkJoin } from 'rxjs';
-import { map, concatMap, mergeMap, tap } from 'rxjs/operators';
+import { map, concatMap, mergeMap, tap, delay } from 'rxjs/operators';
 
 @Injectable()
 export class ApiCallsService {
   constructor() {}
-
-  idData = [
-    {
-      _id: '5c9dda9aca9c171d6ba4b87e',
-    },
-    {
-      _id: '5c9ddb82ca9c171d6ba4b87f',
-    },
-  ];
-
-  authorData = [
-    {
-      _id: '5c9dda9aca9c171d6ba4b87e',
-      author: 'Luke',
-    },
-    {
-      _id: '5c9ddb82ca9c171d6ba4b87f',
-      author: 'Neel',
-    },
-  ];
-
-  titleData = [
-    {
-      _id: '5c9dda9aca9c171d6ba4b87e',
-      title: 'Mrs',
-    },
-    {
-      _id: '5c9ddb82ca9c171d6ba4b87f',
-      title: 'Mr',
-    },
-  ];
-
-  public getMultipleRelationData(): Observable<any> {
-    return of(this.idData);
+  public getBookTitle(bookId: string): Observable<any> {
+    const title =
+      bookId === '0001'
+        ? {
+            title: 'Book 1',
+          }
+        : bookId === '0002'
+        ? {
+            title: 'The sequel',
+          }
+        : bookId === '0003'
+        ? {
+            title: 'Third and final book',
+          }
+        : bookId === '0004'
+        ? {
+            title: 'Fourth book. New beginings',
+          }
+        : bookId === '0005'
+        ? {
+            title: 'The second sequel',
+          }
+        : bookId === '0006'
+        ? {
+            title: 'The last chapter of the sequel',
+          }
+        : bookId === '0007'
+        ? {
+            title: '...The Prequel',
+          }
+        : '';
+    return of(title).pipe(delay(Math.random() * 1000));
   }
 
-  public getAuthorData(id): Observable<any> {
-    let foundIdData = this.authorData.find((data) => data._id === id);
-    return of(foundIdData);
+  /**
+   * Gets the book author for the specified book id
+   */
+  public getBookAuthor(bookId: string): Observable<any> {
+    return of({ author: `Author ${bookId}` }).pipe(delay(Math.random() * 1000));
   }
-
-  public getTitleData(id): Observable<any> {
-    let foundIdData = this.titleData.find((data) => data._id === id);
-    return of(foundIdData);
+  public getAll(): Observable<any> {
+    return of([
+      {
+        bookId: '0001',
+      },
+      {
+        bookId: '0002',
+      },
+      {
+        bookId: '0003',
+      },
+      {
+        bookId: '0004',
+      },
+      {
+        bookId: '0005',
+      },
+      {
+        bookId: '0006',
+      },
+      {
+        bookId: '0007',
+      },
+    ]).pipe(delay(Math.random() * 1000));
   }
+  /*************************************************** */
+  /********End result should be. ********/
 
-  public getCombinedData(): Observable<any> {
-    return this.getMultipleRelationData().pipe(
+  /* Demonstrate your understanding of Asynchronous tasks by implementing a
+   * function to aggregate book data from multiple Asynchronous sources into a
+   * single JSON object. */
+  /** 
+[{
+  author: "Author 0001"
+  bookId: "0001"
+  title: "Book 1"
+},
+{
+  author: "Author 0002"
+  bookId: "0002"
+  title: "The sequel"
+}]
+***/
+  /*************************************************** */
+
+  public getAllBooks(): Observable<Array<any>> {
+    return this.getAll().pipe(
       mergeMap((result: any) => {
-        console.log(result);
-        let allIds = result.map((id) => this.getAuthorData(id._id));
-        let allIds1 = result.map((id) => this.getTitleData(id._id));
-        return result;
-        // return forkJoin(allIds1).pipe(
-        //   map((idDataArray) => {
-        //     console.log(idDataArray);
-        //     result.contact.forEach((eachContact, index) => {
-        //       eachContact.relationship = idDataArray[index];
-        //     });
-        //     return result;
-        //   })
-        // );
+        let r = [...result];
+        console.log('ids', result);
+        let allAuthors = r.map((book) => this.getBookAuthor(book.bookId));
+        let allTitles = r.map((book) => this.getBookTitle(book.bookId));
+
+        /* comment 2 */
+
+        /*  I was only able to get authors and add it to the object but not titles */
+        return forkJoin(...allAuthors).pipe(
+          map((authorArray) => {
+            console.log('Author Array', authorArray);
+            r.forEach((eachAuthor, index) => {
+              eachAuthor.author = authorArray[index].author;
+            });
+            return r;
+          })
+        );
       })
     );
   }

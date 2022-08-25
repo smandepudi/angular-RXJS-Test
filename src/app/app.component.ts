@@ -4,20 +4,18 @@ import { ApiCallsService } from './api-calls.service';
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',
-  styleUrls: [ './app.component.css' ]
+  styleUrls: ['./app.component.css'],
 })
-export class AppComponent  {
+export class AppComponent {
   name = 'Angular';
-  constructor(private _apiService: ApiCallsService) {
+  constructor(private _apiService: ApiCallsService) {}
 
-  }
-
-  combinedData
+  combinedData;
 
   getData() {
-    this._apiService.getCombinedData().subscribe(data => {
+    this._apiService.getAllBooks().subscribe((data) => {
       console.log('this', data);
-      this.combinedData = data
-    })
+      this.combinedData = data;
+    });
   }
 }
