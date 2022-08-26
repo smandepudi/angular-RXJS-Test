@@ -164,27 +164,6 @@ export class ApiCallsService {
         // return forkJoin(requests);
 
         /* working better */
-        const authorRequests = r.map((item) => {
-          return this.getBookAuthor(item.bookId).pipe(
-            map((result) => {
-              return {
-                bookId: item.bookId,
-                author: result.author,
-              };
-            })
-          );
-        });
-
-        const titleRequests = r.map((item) => {
-          return this.getBookTitle(item.bookId).pipe(
-            map((result) => {
-              return {
-                bookId: item.bookId,
-                title: result.title,
-              };
-            })
-          );
-        });
 
         const requests = r.map((item) => {
           return forkJoin(
