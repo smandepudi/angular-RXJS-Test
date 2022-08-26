@@ -191,13 +191,11 @@ export class ApiCallsService {
             this.getBookAuthor(item.bookId),
             this.getBookTitle(item.bookId)
           ).pipe(
-            map(([first, second]) => {
-              console.log(first);
-              console.log(second);
+            map(([authorInfo, titleInfo]) => {
               return {
                 bookId: item.bookId,
-                title: second.title,
-                author: first.author,
+                title: titleInfo.title,
+                author: authorInfo.author,
               };
             })
           );
