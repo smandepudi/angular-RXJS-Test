@@ -186,8 +186,25 @@ export class ApiCallsService {
           );
         });
 
+        const requests = r.map((item) => {
+          return forkJoin(
+            this.getBookAuthor(item.bookId),
+            this.getBookTitle(item.bookId)
+          ).pipe(
+            map(([first, second]) => {
+              console.log(first);
+              console.log(second);
+              return {
+                bookId: item.bookId,
+                title: second.title,
+                author: first.author,
+              };
+            })
+          );
+        });
+
         /***** How do i get both title and author requests */
-        return forkJoin(titleRequests);
+        return forkJoin(requests);
 
         // return r;
       })
