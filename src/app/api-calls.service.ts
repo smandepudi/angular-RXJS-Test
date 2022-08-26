@@ -180,13 +180,14 @@ export class ApiCallsService {
             map((result) => {
               return {
                 bookId: item.bookId,
-                author: result.title,
+                title: result.title,
               };
             })
           );
         });
 
-        return forkJoin(authorRequests);
+        /***** How do i get both title and author requests */
+        return forkJoin(titleRequests);
 
         // return r;
       })
