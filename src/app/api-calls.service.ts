@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { of, Observable, forkJoin } from 'rxjs';
+import { of, Observable, forkJoin, combineLatest } from 'rxjs';
 import { map, concatMap, mergeMap, tap, delay } from 'rxjs/operators';
 
 @Injectable()
@@ -150,21 +150,7 @@ export class ApiCallsService {
         // });
 
         /* working better but can only get author and not Title*/
-        const requests = r.map((item) => {
-          return this.getBookAuthor(item.bookId).pipe(
-            map((result) => {
-              return {
-                bookId: item.bookId,
-                author: result.author,
-              };
-            })
-          );
-        });
-
-        return forkJoin(requests);
-
-        /* working better */
-        // const authorRequests = r.map((item) => {
+        // const requests = r.map((item) => {
         //   return this.getBookAuthor(item.bookId).pipe(
         //     map((result) => {
         //       return {
@@ -175,18 +161,32 @@ export class ApiCallsService {
         //   );
         // });
 
-        // const titleRequests = r.map((item) => {
-        //   return this.getBookTitle(item.bookId).pipe(
-        //     map((result) => {
-        //       return {
-        //         bookId: item.bookId,
-        //         author: result.title,
-        //       };
-        //     })
-        //   );
-        // });
+        // return forkJoin(requests);
 
-        // return forkJoin(authorRequests, titleRequests);
+        /* working better */
+        const authorRequests = r.map((item) => {
+          return this.getBookAuthor(item.bookId).pipe(
+            map((result) => {
+              return {
+                bookId: item.bookId,
+                author: result.author,
+              };
+            })
+          );
+        });
+
+        const titleRequests = r.map((item) => {
+          return this.getBookTitle(item.bookId).pipe(
+            map((result) => {
+              return {
+                bookId: item.bookId,
+                author: result.title,
+              };
+            })
+          );
+        });
+
+        return forkJoin(authorRequests);
 
         // return r;
       })
